@@ -1,23 +1,39 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-const Quiz_main = styled.div`
+const QuizMain = styled.div`
   background: #252d4a;
   width: 650px;
   min-height: 300px;
   border-radius: 15px;
   padding: 20px;
   display: flex;
-
+  position: relative;
   box-shadow: 10px 10px 35px 0 rgba(0, 0, 0, 0.75);
 `;
 
-const Quiz_quiz = styled.div`
+const QuizList = styled.div`
+  background: #252d4a;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+`;
+const QuizFlex = styled.div`
+  width: 600px;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 30px;
+  justify-content: space-around;
+`;
+
+const QuizQuiz = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const Question_section = styled.form``;
-const Question_count = styled.div`
+const QuestionForm = styled.form``;
+const QuestionCount = styled.div`
   margin-bottom: 20px;
   color: #fff;
   font-size: 18px;
@@ -28,11 +44,11 @@ const Span = styled.span`
   color: #fff;
   font-size: 18px;
 `;
-const Question_text = styled.div`
+const QuestionText = styled.div`
   color: #fff;
   font-size: 22px;
 `;
-const Question_area = styled.input`
+const QuestionInput = styled.input`
   padding: 0 0 0 10px;
   height: 70px;
   width: 630px;
@@ -40,73 +56,149 @@ const Question_area = styled.input`
   font-size: 18px;
   outline: none;
 `;
-const Next_question = styled.button`
-  height: 40px;
-  width: 180px;
+const ButtonSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const QuestionButton = styled.button`
+  /* height: 40px; */
+  padding: 5px 0;
+  width: 140px;
   border: none;
   cursor: pointer;
   font-size: 16px;
   border-radius: 7px;
 `;
+const Select = styled.select`
+  height: 30px;
+  position: absolute;
+`;
+const ButtonFlex = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+const Td = styled.td`
+  padding: 10px;
+`;
 
 export default function Quiz() {
   const question = [
-    {
-      questionText: 'Ваше имя ?',
-    },
-    {
-      questionText: 'Ваша фамилия ?',
-    },
-    {
-      questionText: 'Ваш год рождения ?',
-    },
-    {
-      questionText: 'Ваш любимый цвет ?',
-    },
-    {
-      questionText: 'Ваше любимое блюдо ?',
-    },
-    {
-      questionText: 'Где предпочитаете отдыхать ?',
-    },
-    {
-      questionText: 'Как вы относитесь к продукции Aplle ?',
-    },
-    {
-      questionText: 'Назовите столицу Мадагаскара ?',
-    },
-    {
-      questionText: 'Кто написал третий закон Ньютона ?',
-    },
-    {
-      questionText: 'Скажите,понравился ли вам опрос ?',
-    },
+    'Напишите Ваше имя ?',
+    'Напишите Вашу фамилию ?',
+    'Напишите Ваш год рождения ?',
+    'Какой Ваш любимый цвет ?',
+    'Какое Ваше любимое блюдо ?',
+    'Где Вы предпочитаете отдыхать ?',
+    'Как вы относитесь к продукции Aplle ?',
+    'Назовите столицу Мадагаскара ?',
+    'Кто написал третий закон Ньютона ?',
+    'Скажите,понравился ли вам опрос ?',
   ];
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answer, setAnswer] = useState([]);
+  const [answerList, setAnswerList] = useState(false);
+  const [disableSelect, setDisableSelect] = useState(true);
+  const [valueSelect, setValueSelect] = useState('');
 
   const nextQuestionClick = () => {
     const nextQuestion = currentQuestion + 1;
-
     if (nextQuestion < question.length) {
       setCurrentQuestion(nextQuestion);
+    } else {
+      setAnswerList(true);
     }
   };
+  const prevQuestionClick = () => {
+    const prevQuestion = currentQuestion - 1;
 
+    if (prevQuestion < question.length && prevQuestion >= 0) {
+      setCurrentQuestion(prevQuestion);
+    }
+  };
+  const onChange = (e) => {
+    answer[currentQuestion] = e.target.value;
+    setAnswer([...answer]);
+  };
+  const onChangeSelect = () => {
+    setAnswerList(false);
+    setDisableSelect(false);
+  };
+  function changeSelect(e) {
+    setCurrentQuestion(Number(e.target.value));
+    console.log(typeof e.target.value);
+  }
+  console.log(typeof currentQuestion);
   return (
-    <Quiz_main>
-      <Quiz_quiz>
-        <Question_count>
-          <Span>Вопрос {currentQuestion + 1}</Span> / {question.length}
-        </Question_count>
-        <Question_text>{question[currentQuestion].questionText}</Question_text>
-        <Question_section>
-          <Question_area type="text" placeholder="Ваш ответ"></Question_area>
-        </Question_section>
-        <Next_question onClick={() => nextQuestionClick()}>
-          Следующий вопрос
-        </Next_question>
-      </Quiz_quiz>
-    </Quiz_main>
+    <QuizMain>
+      {answerList ? (
+        <QuizList>
+          <QuizFlex>
+            <table border="1" bordercolor="#c6c6c6">
+              {question.map((item) => (
+                <tr>
+                  <Td key={item}>{item}</Td>
+                </tr>
+              ))}
+            </table>
+            <table border="1" bordercolor="#c6c6c6">
+              {answer.map((item) => (
+                <tr>
+                  <Td key={item}>{item}</Td>
+                </tr>
+              ))}
+            </table>
+          </QuizFlex>
+          <ButtonFlex>
+            <QuestionButton
+              onClick={() => {
+                setAnswer([]);
+                setAnswerList(false);
+                setCurrentQuestion(0);
+                setDisableSelect(true);
+              }}
+            >
+              Reset
+            </QuestionButton>
+            <QuestionButton onClick={onChangeSelect}>Change</QuestionButton>
+            <QuestionButton>Save as CSV</QuestionButton>
+          </ButtonFlex>
+        </QuizList>
+      ) : (
+        <QuizQuiz>
+          <Select
+            value={currentQuestion}
+            hidden={disableSelect}
+            onChange={changeSelect}
+          >
+            {question.map((item, index) => (
+              <option value={index}>Перейти к вопросу : {index + 1}</option>
+            ))}
+          </Select>
+          <QuestionCount>
+            <Span>Вопрос {currentQuestion + 1}</Span> / {question.length}
+          </QuestionCount>
+          <QuestionText>{question[currentQuestion]}</QuestionText>
+          <QuestionForm onSubmit={(e) => e.preventDefault()}>
+            <QuestionInput
+              type="text"
+              onChange={onChange}
+              value={answer[currentQuestion] || ''}
+              placeholder="Ваш ответ"
+            ></QuestionInput>
+          </QuestionForm>
+          <ButtonSection>
+            <QuestionButton onClick={() => prevQuestionClick()}>
+              Предыдущий вопрос
+            </QuestionButton>
+
+            <QuestionButton onClick={() => nextQuestionClick()}>
+              Следующий вопрос
+            </QuestionButton>
+          </ButtonSection>
+        </QuizQuiz>
+      )}
+    </QuizMain>
   );
 }
