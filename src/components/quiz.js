@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+// import { CSVLink } from 'react-csv';
 
 const QuizMain = styled.div`
   background: #252d4a;
@@ -70,6 +71,7 @@ const QuestionButton = styled.button`
   font-size: 16px;
   border-radius: 7px;
 `;
+
 const Select = styled.select`
   height: 30px;
   position: absolute;
@@ -99,8 +101,8 @@ export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answer, setAnswer] = useState([]);
   const [answerList, setAnswerList] = useState(false);
+  const [changeAnswerList, setChangeAnswerList] = useState(null);
   const [disableSelect, setDisableSelect] = useState(true);
-  const [valueSelect, setValueSelect] = useState('');
 
   const nextQuestionClick = () => {
     const nextQuestion = currentQuestion + 1;
@@ -126,28 +128,53 @@ export default function Quiz() {
     setDisableSelect(false);
   };
   function changeSelect(e) {
-    setCurrentQuestion(Number(e.target.value));
     console.log(typeof e.target.value);
+    setCurrentQuestion(Number(e.target.value));
   }
-  console.log(typeof currentQuestion);
+  const onChangeList = (e, i) => {};
+  useEffect(() => {
+    const change = (e) => {
+      if (e.key === 'Enter') {
+        onChangeList(e);
+      }
+    };
+    window.addEventListener('keydown', change);
+    return () => window.removeEventListener('keydown', change);
+  }, [onChangeList]);
+
+  // const fullListToCSV = [...question, ...answer].join(';');
+
   return (
     <QuizMain>
       {answerList ? (
         <QuizList>
           <QuizFlex>
-            <table border="1" bordercolor="#c6c6c6">
-              {question.map((item) => (
-                <tr>
-                  <Td key={item}>{item}</Td>
-                </tr>
-              ))}
-            </table>
-            <table border="1" bordercolor="#c6c6c6">
-              {answer.map((item) => (
-                <tr>
-                  <Td key={item}>{item}</Td>
-                </tr>
-              ))}
+            <table border="1" bordercolor="#c6c6c6" bgcolor="#727272">
+              <tbody>
+                {question.map((el, i) => (
+                  <tr key={i}>
+                    <Td>{el}</Td>
+                    <Td>
+                      {changeAnswerList === i ? (
+                        <>
+                          <input type="text" onChange />
+                          <button
+                            onClick={() => {
+                              setChangeAnswerList(null);
+                            }}
+                          >
+                            x
+                          </button>
+                        </>
+                      ) : (
+                        <div onDoubleClick={() => setChangeAnswerList(i)}>
+                          {answer[i]}
+                        </div>
+                      )}
+                    </Td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </QuizFlex>
           <ButtonFlex>
@@ -162,7 +189,9 @@ export default function Quiz() {
               Reset
             </QuestionButton>
             <QuestionButton onClick={onChangeSelect}>Change</QuestionButton>
-            <QuestionButton>Save as CSV</QuestionButton>
+            <QuestionButton>
+              {/* <CSVLink data={fullListToCSV}>Save as CSV</CSVLink> */}
+            </QuestionButton>
           </ButtonFlex>
         </QuizList>
       ) : (
@@ -173,7 +202,9 @@ export default function Quiz() {
             onChange={changeSelect}
           >
             {question.map((item, index) => (
-              <option value={index}>Перейти к вопросу : {index + 1}</option>
+              <option value={index} key={index}>
+                Перейти к вопросу : {index + 1}
+              </option>
             ))}
           </Select>
           <QuestionCount>
